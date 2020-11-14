@@ -32,6 +32,6 @@ final class Subscription: Model, Content {
         self.original_transaction_id = original_transaction_id
         self.subscription_status = subscription_status
         self.purchase_date = purchase_date
-        self.properties = product_id
+        self.product_id = product_id
     }
 }
