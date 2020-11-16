@@ -59,10 +59,10 @@ final class Subscription: Model, Content {
         environment: String,
         expiration_intent: Int?,
         notification_type: String,
-        password: String?
+        password: String?,
         unified_receipt: UnifiedReceipt,
         bid: String,
-        bvrs: String,
+        bvrs: String
     ) {
         self.id = id
         self.auto_renew_adam_id = auto_renew_adam_id

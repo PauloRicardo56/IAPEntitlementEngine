@@ -15,9 +15,15 @@ struct SubscriptionController: RouteCollection {
         return Subscription.query(on: req.db).all()
     }
 
-    func create(req: Request) throws -> EventLoopFuture<Subscription> {
-        let subscription = try req.content.decode(Subscription.self)
-        return subscription.save(on: req.db).map { subscription }
+    func create(req: Request) throws -> HTTPStatus {
+        do {
+            let subscription = try req.content.decode(Subscription.self)
+            let _ = subscription.save(on: req.db).map { subscription }
+            return .ok
+        } catch(let e) {
+            print(e)
+            return .badRequest
+        }
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {

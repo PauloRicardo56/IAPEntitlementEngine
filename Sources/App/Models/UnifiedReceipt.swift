@@ -9,16 +9,15 @@ import Vapor
 import Fluent
 
 struct UnifiedReceipt: Content {
-    let latestReceipt: String
-    let pendingRenewalInfo: [RenewalInfo]
-    let environment: String
     let status: Int
+    let latestReceipt, environment: String
+    let pendingRenewalInfo: [RenewalInfo]
     let latestReceiptInfo: [Receipt]
 
     enum CodingKeys: String, CodingKey {
+        case environment, status
         case latestReceipt = "latest_receipt"
         case pendingRenewalInfo = "pending_renewal_info"
-        case environment, status
         case latestReceiptInfo = "latest_receipt_info"
     }
 }
