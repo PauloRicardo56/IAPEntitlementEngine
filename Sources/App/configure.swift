@@ -22,7 +22,9 @@ public func configure(_ app: Application) throws {
                         database: "pauloricardo"
     ), as: .psql)
 
+    // Migrations
     app.migrations.add(CreateSubscription())
+//    app.migrations.add(CreateUnifiedReceipt())
 
     // register routes
     try routes(app)

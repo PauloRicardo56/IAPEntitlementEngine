@@ -14,7 +14,7 @@ struct CreateSubscription: Migration {
             .field("expiration_intent", .int)
             .field("notification_type", .string, .required)
             .field("password", .string)
-            .field("unified_receipt", .string, .required)
+            .field("unified_receipt", .dictionary, .required)
             .field("bid", .string, .required)
             .field("bvrs", .string, .required)
             .field("original_transaction_id", .string)

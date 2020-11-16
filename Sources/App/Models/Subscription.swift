@@ -7,11 +7,26 @@ final class Subscription: Model, Content {
     @ID(key: .id)
     var id: UUID?
     
-    @OptionalField(key: "auto_renew_adam_id")
-    var auto_renew_adam_id: String?
+    @Field(key: "unified_receipt")
+    var unified_receipt: UnifiedReceipt
+    
+    @Field(key: "environment")
+    var environment: String
+    
+    @Field(key: "notification_type")
+    var notification_type: String
     
     @Field(key: "auto_renew_product_id")
     var auto_renew_product_id: String
+    
+    @Field(key: "bid")
+    var bid: String
+    
+    @Field(key: "bvrs")
+    var bvrs: String
+    
+    @OptionalField(key: "auto_renew_adam_id")
+    var auto_renew_adam_id: String?
     
     @OptionalField(key: "auto_renew_status")
     var auto_renew_status: String?
@@ -25,26 +40,11 @@ final class Subscription: Model, Content {
     @OptionalField(key: "auto_renew_status_change_date_pst")
     var auto_renew_status_change_date_pst: String?
     
-    @Field(key: "environment")
-    var environment: String
-    
     @OptionalField(key: "expiration_intent")
     var expiration_intent: Int?
-
-    @Field(key: "notification_type")
-    var notification_type: String
     
     @OptionalField(key: "password")
     var password: String?
-    
-    @Children(for: \.$subscription)
-    var unified_receipt: UnifiedReceipt
-    
-    @Field(key: "bid")
-    var bid: String
-    
-    @Field(key: "bvrs")
-    var bvrs: String
     
     @OptionalField(key: "original_transaction_id")
     var originalTransactionID: String?

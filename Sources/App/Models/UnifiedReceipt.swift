@@ -14,9 +14,6 @@ final class UnifiedReceipt: Model, Content {
     @ID(key: .id)
     var id: UUID?
     
-    @Parent(key: "subscription_id")
-    var subscription: Subscription?
-    
     @Field(key: "status")
     var status: Int
     
