@@ -1,79 +1,40 @@
-import Fluent
+//
+//  UnifiedReceipt.swift
+//  
+//
+//  Created by Paulo Ricardo on 16/11/20.
+//
+
 import Vapor
+import Fluent
 
-final class Subscription: Model, Content {
-    static let schema = "subscriptions"
-    
-    @ID(key: .id)
-    var id: UUID?
+struct UnifiedReceipt: Content {
+    let latestReceipt: String
+    let pendingRenewalInfo: [RenewalInfo]
+    let environment: String
+    let status: Int
+    let latestReceiptInfo: [Receipt]
 
-    @Field(key: "notification_type")
-    var notification_type: String
-    
-    @Field(key: "environment")
-    var environment: String
-    
-    @Field(key: "auto_renew_product_id")
-    var auto_renew_product_id: String
-    
-    @Field(key: "auto_renew_status")
-    var auto_renew_status: String
-    
-    @Field(key: "bid")
-    var bid: String
-    
-    @Field(key: "bvrs")
-    var bvrs: String
-    
-    @Field(key: "auto_renew_status_change_date")
-    var auto_renew_status_change_date: String
-    
-    @Field(key: "auto_renew_status_change_date_ms")
-    var auto_renew_status_change_date_ms: String
-    
-    @Field(key: "auto_renew_status_change_date_pst")
-    var auto_renew_status_change_date_pst: String
-    
-    @Field(key: "unified_receipt")
-    var unified_receipt: UnifiedReceipt
-    
-    init() { }
-
-    init(
-        id: UUID? = nil,
-        notification_type: String,
-        environment: String,
-        auto_renew_product_id: String,
-        auto_renew_status: String,
-        bid: String,
-        bvrs: String,
-        auto_renew_status_change_date: String,
-        auto_renew_status_change_date_ms: String,
-        auto_renew_status_change_date_pst: String,
-        unified_receipt: UnifiedReceipt
-    ) {
-        self.id = id
-        self.notification_type = notification_type
-        self.environment = environment
-        self.auto_renew_product_id = auto_renew_product_id
-        self.auto_renew_status = auto_renew_status
-        self.bid = bid
-        self.bvrs = bvrs
-        self.auto_renew_status_change_date = auto_renew_status_change_date
-        self.auto_renew_status_change_date_ms = auto_renew_status_change_date_ms
-        self.auto_renew_status_change_date_pst = auto_renew_status_change_date_pst
-        self.unified_receipt = unified_receipt
+    enum CodingKeys: String, CodingKey {
+        case latestReceipt = "latest_receipt"
+        case pendingRenewalInfo = "pending_renewal_info"
+        case environment, status
+        case latestReceiptInfo = "latest_receipt_info"
     }
 }
 
+struct RenewalInfo: Content {
+    let autoRenewStatus, autoRenewProductID, productID, originalTransactionID: String
+    
+    enum CodingKeys: String, CodingKey {
+        case autoRenewStatus = "auto_renew_status"
+        case autoRenewProductID = "auto_renew_product_id"
+        case productID = "product_id"
+        case originalTransactionID = "original_transaction_id"
+    }
+}
 
-//"notification_type": "DID_RENEW"
-//"environment": "Sandbox"
-//    "auto_renew_product_id": "com.QuintetoFantastico.MacroChallenge.sharedbusiness",
-//    "auto_renew_status": "true",
-//    "bid": "com.QuintetoFantastico.MacroChallenge",
-//    "bvrs": "1",
-//    "unified_receipt": {
+//"unified_receipt": {
 //        "status": 0,
 //        "environment": "Sandbox",
 //        "latest_receipt_info": [
@@ -124,4 +85,3 @@ final class Subscription: Model, Content {
 //                "original_transaction_id": "1000000742037455"
 //            }
 //        ],
-//        "latest_receipt":
