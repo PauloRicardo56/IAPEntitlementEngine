@@ -7,37 +7,37 @@ final class Subscription: Model, Content {
     @ID(key: .id)
     var id: UUID?
     
-    @Field(key: "auto_renew_adam_id")
+    @OptionalField(key: "auto_renew_adam_id")
     var auto_renew_adam_id: String?
     
     @Field(key: "auto_renew_product_id")
     var auto_renew_product_id: String
     
-    @Field(key: "auto_renew_status")
+    @OptionalField(key: "auto_renew_status")
     var auto_renew_status: String?
     
-    @Field(key: "auto_renew_status_change_date")
+    @OptionalField(key: "auto_renew_status_change_date")
     var auto_renew_status_change_date: String?
     
-    @Field(key: "auto_renew_status_change_date_ms")
+    @OptionalField(key: "auto_renew_status_change_date_ms")
     var auto_renew_status_change_date_ms: String?
     
-    @Field(key: "auto_renew_status_change_date_pst")
+    @OptionalField(key: "auto_renew_status_change_date_pst")
     var auto_renew_status_change_date_pst: String?
     
     @Field(key: "environment")
     var environment: String
     
-    @Field(key: "expiration_intent")
+    @OptionalField(key: "expiration_intent")
     var expiration_intent: Int?
 
     @Field(key: "notification_type")
     var notification_type: String
     
-    @Field(key: "password")
+    @OptionalField(key: "password")
     var password: String?
     
-    @Field(key: "unified_receipt")
+    @Children(for: \.$subscription)
     var unified_receipt: UnifiedReceipt
     
     @Field(key: "bid")
@@ -45,6 +45,9 @@ final class Subscription: Model, Content {
     
     @Field(key: "bvrs")
     var bvrs: String
+    
+    @OptionalField(key: "original_transaction_id")
+    var originalTransactionID: String?
     
     init() { }
 
@@ -78,5 +81,9 @@ final class Subscription: Model, Content {
         self.unified_receipt = unified_receipt
         self.bid = bid
         self.bvrs = bvrs
+    }
+    
+    func afterDecode() throws {
+        self.originalTransactionID = unified_receipt.latest_receipt_info.first?.originalTransactionID
     }
 }

@@ -14,16 +14,36 @@ struct SubscriptionController: RouteCollection {
     func index(req: Request) throws -> EventLoopFuture<[Subscription]> {
         return Subscription.query(on: req.db).all()
     }
+    
+//    func get(on db: Database, transactionID: String?) -> EventLoopFuture<[Subscription]> {
+//        return Subscription.query(on: db)
+//            .all()
+////            .filter(\.$originalTransactionID == "1000000742037455")
+////            .first()
+//    }
 
     func create(req: Request) throws -> HTTPStatus {
         do {
             let subscription = try req.content.decode(Subscription.self)
-            let _ = subscription.save(on: req.db).map { subscription }
+            let _ = subscription.save(on: req.db)
+            let future = Subscription.query(on: req.db).all()
+            future.map { _ in
+                print(222)
+            }
+//            get(on: req.db, transactionID: subscription.originalTransactionID).map { existingSubscription in
+////                if existingSubscription != nil {
+////                    let _ = existingSubscription?.delete(on: req.db)
+////                }
+////                let _ = subscription.save(on: req.db)
+//                print("1111")
+//            }
             return .ok
         } catch(let e) {
             print(e)
             return .badRequest
         }
+        
+        
     }
 
     func delete(req: Request) throws -> EventLoopFuture<HTTPStatus> {

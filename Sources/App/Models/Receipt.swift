@@ -8,7 +8,6 @@
 import Fluent
 import Vapor
 
-
 struct Receipt: Content {
     let quantity,
         expiresDatePst,

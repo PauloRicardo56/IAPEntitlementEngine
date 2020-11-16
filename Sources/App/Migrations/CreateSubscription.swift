@@ -17,6 +17,7 @@ struct CreateSubscription: Migration {
             .field("unified_receipt", .string, .required)
             .field("bid", .string, .required)
             .field("bvrs", .string, .required)
+            .field("original_transaction_id", .string)
             .create()
     }
 

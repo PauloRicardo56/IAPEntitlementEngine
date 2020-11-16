@@ -5,7 +5,11 @@ func routes(_ app: Application) throws {
     try app.register(collection: SubscriptionController())
     try app.register(collection: AppStoreServerController())
     
-    app.get("teste") { req in
-        return HTTPStatus.ok
+    app.get("test") { (req) in
+        Subscription.query(on: req.db).all()
     }
+    
+//    app.get("teste") { req in
+//        Subscription.query(on: req.db).all
+//    }
 }

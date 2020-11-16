@@ -5,20 +5,49 @@
 //  Created by Paulo Ricardo on 16/11/20.
 //
 
-import Vapor
 import Fluent
+import Vapor
 
-struct UnifiedReceipt: Content {
-    let status: Int
-    let latestReceipt, environment: String
-    let pendingRenewalInfo: [RenewalInfo]
-    let latestReceiptInfo: [Receipt]
-
-    enum CodingKeys: String, CodingKey {
-        case environment, status
-        case latestReceipt = "latest_receipt"
-        case pendingRenewalInfo = "pending_renewal_info"
-        case latestReceiptInfo = "latest_receipt_info"
+final class UnifiedReceipt: Model, Content {
+    static let schema = "unifiedreceipts"
+    
+    @ID(key: .id)
+    var id: UUID?
+    
+    @Parent(key: "subscription_id")
+    var subscription: Subscription?
+    
+    @Field(key: "status")
+    var status: Int
+    
+    @Field(key: "latest_receipt")
+    var latest_receipt: String
+    
+    @Field(key: "environment")
+    var environment: String
+    
+    @Field(key: "pending_renewal_info")
+    var pending_renewal_info: [RenewalInfo]
+    
+    @Field(key: "latest_receipt_info")
+    var latest_receipt_info: [Receipt]
+    
+    init() {}
+    
+    init(
+        id: UUID? = nil,
+        status: Int,
+        latest_receipt: String,
+        environment: String,
+        pending_renewal_info: [RenewalInfo],
+        latest_receipt_info: [Receipt]
+    ) {
+        self.id = id
+        self.status = status
+        self.latest_receipt = latest_receipt
+        self.environment = environment
+        self.pending_renewal_info = pending_renewal_info
+        self.latest_receipt_info = latest_receipt_info
     }
 }
 

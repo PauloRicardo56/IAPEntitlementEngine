@@ -15,7 +15,6 @@ struct AppStoreServerController: RouteCollection {
             do {
                 let subscription = try req.content.decode(Subscription.self)
                 let _ = subscription.save(on: req.db).map { subscription }
-                
             } catch(let e) {
                 return .badRequest
             }
