@@ -9,6 +9,21 @@ struct SubscriptionController: RouteCollection {
         subscriptions.group(":subscriptionID") { subscription in
             subscription.delete(use: delete)
         }
+        
+        let unifiedReceipt = routes.grouped("unified_receipt")
+        unifiedReceipt.get("last", ":originalTransactionID") { req -> EventLoopFuture<[UnifiedReceipt]> in
+            Subscription.query(on: req.db)
+                .field(\.$originalTransactionID)
+                .filter(\.$originalTransactionID == req.parameters.get("originalTransactionID"))
+                .all(\.$unified_receipt)
+        }
+    }
+    
+    func getLatestReceipt(req: Request) -> EventLoopFuture<[Subscription]> {
+        Subscription.query(on: req.db)
+            .field(\.$unified_receipt)
+            .filter(\.$originalTransactionID == req.parameters.get("originalTransactionID"))
+            .all()
     }
 
     func index(req: Request) throws -> EventLoopFuture<[Subscription]> {

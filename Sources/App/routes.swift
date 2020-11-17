@@ -8,8 +8,4 @@ func routes(_ app: Application) throws {
     app.get("test") { (req) in
         Subscription.query(on: req.db).all()
     }
-    
-//    app.get("teste") { req in
-//        Subscription.query(on: req.db).all
-//    }
 }
