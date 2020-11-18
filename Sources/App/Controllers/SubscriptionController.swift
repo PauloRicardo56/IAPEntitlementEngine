@@ -5,17 +5,26 @@ struct SubscriptionController: RouteCollection {
     func boot(routes: RoutesBuilder) throws {
         let subscriptions = routes.grouped("subscription")
         subscriptions.get(use: index)
-        subscriptions.post(use: create)
+        subscriptions.on(.POST, body: .collect(maxSize: "300kb"), use: create)
         subscriptions.group(":subscriptionID") { subscription in
             subscription.delete(use: delete)
         }
         
         let unifiedReceipt = routes.grouped("unified_receipt")
-        unifiedReceipt.get("last", ":originalTransactionID") { req -> EventLoopFuture<[UnifiedReceipt]> in
-            Subscription.query(on: req.db)
+        unifiedReceipt.get("last", ":originalTransactionID") { req -> EventLoopFuture<SubscriptionValidation> in
+            let unifiedReceipt = Subscription.query(on: req.db)
                 .field(\.$originalTransactionID)
                 .filter(\.$originalTransactionID == req.parameters.get("originalTransactionID"))
                 .all(\.$unified_receipt)
+            return unifiedReceipt.map { receipts in
+                guard let lastTransaction = receipts.first?.latest_receipt_info.first else {
+                    return .init(isValid: false, expirationDate: "")
+                }
+                let currDateMS = Int(Date().timeIntervalSince1970 * 1000)
+                let expirationDate = lastTransaction.expiresDateMS
+                let isValid = Int(expirationDate) ?? currDateMS > currDateMS
+                return .init(isValid: isValid, expirationDate: expirationDate)
+            }
         }
     }
     
@@ -59,3 +68,5 @@ struct SubscriptionController: RouteCollection {
             .transform(to: .ok)
     }
 }
+
+extension Bool: Content {}
