@@ -2,6 +2,7 @@ import Fluent
 import Vapor
 
 struct SubscriptionController: RouteCollection {
+    
     func boot(routes: RoutesBuilder) throws {
         let subscriptions = routes.grouped("subscription")
         subscriptions.get(use: index)
@@ -11,21 +12,30 @@ struct SubscriptionController: RouteCollection {
         }
         
         let unifiedReceipt = routes.grouped("unified_receipt")
-        unifiedReceipt.get("last", ":originalTransactionID") { req -> EventLoopFuture<SubscriptionValidation> in
-            let unifiedReceipt = Subscription.query(on: req.db)
-                .field(\.$originalTransactionID)
-                .filter(\.$originalTransactionID == req.parameters.get("originalTransactionID"))
-                .all(\.$unified_receipt)
-            return unifiedReceipt.map { receipts in
+        unifiedReceipt.get("last", ":originalTransactionID", use: validateSubscription)
+    }
+    
+    private func validateSubscription(req: Request) -> EventLoopFuture<SubscriptionValidation> {
+        getUnifiedReceipt(from: req.parameters.get("originalTransactionID"), req: req)
+            .map { receipts in
                 guard let lastTransaction = receipts.first?.latest_receipt_info.first else {
                     return .init(isValid: false, expirationDate: "")
                 }
-                let currDateMS = Int(Date().timeIntervalSince1970 * 1000)
-                let expirationDate = lastTransaction.expiresDateMS
-                let isValid = Int(expirationDate) ?? currDateMS > currDateMS
-                return .init(isValid: isValid, expirationDate: expirationDate)
+                
+                /// ex: 1605733416.213297 -> 1605733416213.297
+                let currDateMS = Date().timeIntervalSince1970 * 1000
+                /// ex: "1605732074000" -> 1605732074000.0
+                let expirationDate = Double(lastTransaction.expiresDateMS) ?? 0.0
+                let isValid = expirationDate > currDateMS
+                return .init(isValid: isValid, expirationDate: lastTransaction.expiresDateMS)
             }
-        }
+    }
+    
+    private func getUnifiedReceipt(from id: String?, req: Request) -> EventLoopFuture<[UnifiedReceipt]> {
+        Subscription.query(on: req.db)
+            .field(\.$originalTransactionID)
+            .filter(\.$originalTransactionID == id)
+            .all(\.$unified_receipt)
     }
     
     func getLatestReceipt(req: Request) -> EventLoopFuture<[Subscription]> {
