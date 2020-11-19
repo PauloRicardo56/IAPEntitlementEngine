@@ -11,12 +11,14 @@ struct SubscriptionController: RouteCollection {
             subscription.delete(use: delete)
         }
         
-        let unifiedReceipt = routes.grouped("unified_receipt")
-        unifiedReceipt.get("last", ":originalTransactionID", use: validateSubscription)
+        let validateReceipt = routes.grouped("validateSubscription")
+        validateReceipt.get(":originalTransactionID", use: validateSubscription)
     }
     
     private func validateSubscription(req: Request) -> EventLoopFuture<SubscriptionValidation> {
-        getUnifiedReceipt(from: req.parameters.get("originalTransactionID"), req: req)
+        let transactionID = req.parameters.get("originalTransactionID")
+        
+        return SubscriptionQueries.getUnifiedReceipt(from: transactionID, req: req)
             .map { receipts in
                 guard let lastTransaction = receipts.first?.latest_receipt_info.first else {
                     return .init(isValid: false, expirationDate: "")
@@ -31,19 +33,12 @@ struct SubscriptionController: RouteCollection {
             }
     }
     
-    private func getUnifiedReceipt(from id: String?, req: Request) -> EventLoopFuture<[UnifiedReceipt]> {
-        Subscription.query(on: req.db)
-            .field(\.$originalTransactionID)
-            .filter(\.$originalTransactionID == id)
-            .all(\.$unified_receipt)
-    }
-    
-    func getLatestReceipt(req: Request) -> EventLoopFuture<[Subscription]> {
-        Subscription.query(on: req.db)
-            .field(\.$unified_receipt)
-            .filter(\.$originalTransactionID == req.parameters.get("originalTransactionID"))
-            .all()
-    }
+//    private func getUnifiedReceipt(from id: String?, req: Request) -> EventLoopFuture<[UnifiedReceipt]> {
+//        Subscription.query(on: req.db)
+//            .field(\.$originalTransactionID)
+//            .filter(\.$originalTransactionID == id)
+//            .all(\.$unified_receipt)
+//    }
 
     func index(req: Request) throws -> EventLoopFuture<[Subscription]> {
         return Subscription.query(on: req.db).all()
